@@ -1,0 +1,213 @@
+// Dijkstra's Algorithm
+In this we are like to find the shortest distance in undirected graph with distinct weight we use PriorityQueue as we want min from all 
+
+class Pair{
+    int nbr;
+    int weight;
+    Pair(int n,int w){
+        nbr = n;
+        weight = w;
+    }
+}
+
+class Solution {
+    public int[] dijkstra(int V, int[][] edges, int src) {
+        // code here
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for(int i=0;i<V;i++){
+            adj.add(new ArrayList<>());
+        }
+        for(int i=0;i<edges.length;i++){
+            int u = edges[i][0];
+            int v = edges[i][1];
+            int w = edges[i][2];
+            adj.get(u).add(new Pair(v,w));
+            adj.get(v).add(new Pair(u,w));
+        }
+        PriorityQueue<Pair> q = new PriorityQueue<>((a,b)->a.weight-b.weight);
+        int dist[] = new int[V];
+        Arrays.fill(dist,(int)1e9);
+        dist[src] = 0;
+        q.add(new Pair(src,0));
+        while(q.size()>0){
+            Pair u = q.poll();
+            for(Pair p: adj.get(u.nbr)){
+                if(dist[u.nbr]+p.weight<dist[p.nbr]){
+                    dist[p.nbr]=dist[u.nbr]+p.weight;
+                    q.add(new Pair(p.nbr,dist[p.nbr]));
+                }
+            }
+        }
+        
+        return dist;
+    }
+}
+
+
+/// Cheapest flights within k stops
+In this question we add new state to the pair class as their a thing that chnaging the path or can say restricting the path like k stops /time windows 
+class Pair {
+    int node;
+    int cost;
+    int stops;
+
+    Pair(int node, int cost, int stops) {
+        this.node = node;
+        this.cost = cost;
+        this.stops = stops;
+    }
+}
+
+class Solution {
+    public int findCheapestPrice(int n, int[][] flights, int src, int dst, int k) {
+
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+
+        for (int[] f : flights) {
+            adj.get(f[0]).add(new Pair(f[1], f[2], 0));
+        }
+
+        PriorityQueue<Pair> pq =
+                new PriorityQueue<>((a, b) -> a.cost - b.cost);
+
+        pq.add(new Pair(src, 0, 0));
+
+        int[][] dist = new int[n][k + 2];
+        for (int i = 0; i < n; i++)
+            Arrays.fill(dist[i], (int)1e9);
+
+        dist[src][0] = 0;
+
+        while (!pq.isEmpty()) {
+            Pair cur = pq.poll();
+
+            if (cur.node == dst) return cur.cost;
+            if (cur.stops > k) continue;
+
+            for (Pair nei : adj.get(cur.node)) {
+                int nextCost = cur.cost + nei.cost;
+
+                if (nextCost < dist[nei.node][cur.stops + 1]) {
+                    dist[nei.node][cur.stops + 1] = nextCost;
+                    pq.add(new Pair(nei.node, nextCost, cur.stops + 1));
+                }
+            }
+        }
+        return -1;
+    }
+}
+
+
+///// Network Delay time
+just a normal questio not think so much only to add Dijkstra's Algorithm and then check dist array one with max is the answer 
+class Pair {
+    int dst;
+    int wgt;
+    Pair(int dst, int wgt) {
+        this.dst = dst;
+        this.wgt = wgt;
+    }
+}
+
+class Solution {
+    public int networkDelayTime(int[][] times, int n, int k) {
+
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for (int i = 0; i <= n; i++) adj.add(new ArrayList<>());
+
+        for (int[] f : times) {
+            adj.get(f[0]).add(new Pair(f[1], f[2]));
+        }
+
+        PriorityQueue<Pair> pq =
+                new PriorityQueue<>((a, b) -> a.wgt - b.wgt);
+
+        int[] dist = new int[n + 1];
+        Arrays.fill(dist, (int) 1e9);
+
+        dist[k] = 0;
+        pq.add(new Pair(k, 0));
+
+        while (!pq.isEmpty()) {
+            Pair p = pq.poll();
+
+            for (Pair node : adj.get(p.dst)) {
+                if (dist[p.dst] + node.wgt < dist[node.dst]) {
+                    dist[node.dst] = dist[p.dst] + node.wgt;
+                    pq.add(new Pair(node.dst, dist[node.dst]));
+                }
+            }
+        }
+
+        int ans = 0;
+        for (int i = 1; i <= n; i++) {
+            if (dist[i] == (int) 1e9) return -1;
+            ans = Math.max(ans, dist[i]);
+        }
+
+        return ans;
+    }
+}
+
+
+
+//////////////// Number of ways to arrive at destination
+this is a good question first i think to add state in pair class then got that ask question is restricting the path or not and get no so make a array of ways to
+store ways all for dest place then update it 
+class Pair {
+    int node;
+    long dist;
+    Pair(int node, long dist) {
+        this.node = node;
+        this.dist = dist;
+    }
+}
+class Solution {
+    static final int MOD = 1_000_000_007;
+
+    public int countPaths(int n, int[][] roads) {
+
+        ArrayList<ArrayList<Pair>> adj = new ArrayList<>();
+        for (int i = 0; i < n; i++) adj.add(new ArrayList<>());
+
+        for (int[] r : roads) {
+            adj.get(r[0]).add(new Pair(r[1], r[2]));
+            adj.get(r[1]).add(new Pair(r[0], r[2]));
+        }
+
+        long[] dist = new long[n];
+        long[] ways = new long[n];
+        Arrays.fill(dist, Long.MAX_VALUE);
+
+        PriorityQueue<Pair> pq =
+                new PriorityQueue<>((a, b) -> Long.compare(a.dist, b.dist));
+
+        dist[0] = 0;
+        ways[0] = 1;
+        pq.add(new Pair(0, 0));
+
+        while (!pq.isEmpty()) {
+            Pair cur = pq.poll();
+            int u = cur.node;
+
+            if (cur.dist > dist[u]) continue;
+
+            for (Pair p : adj.get(u)) {
+                int v = p.node;
+                long newDist = dist[u] + p.dist;
+
+                if (newDist < dist[v]) {
+                    dist[v] = newDist;
+                    ways[v] = ways[u];
+                    pq.add(new Pair(v, newDist));
+                } 
+                else if (newDist == dist[v]) {
+                    ways[v] = (ways[v] + ways[u]) % MOD;
+                }
+            }
+        }
+
+        return (int) ways[n - 1];
+    }
+}
