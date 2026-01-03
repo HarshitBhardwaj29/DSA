@@ -78,3 +78,69 @@ class DSU {
         }
     }
 }
+
+
+?????   NUMBER OF PROVINCES ////////
+
+We find the ultimate parent of every node. If two nodes have the same ultimate parent, they belong to the same province. The number of provinces is equal to the number of nodes that have different ultimate parents.
+class Solution {
+    class UnionFind {
+        int parent[];
+        int rank[];
+
+        UnionFind(int V) {
+            parent = new int[V];
+            rank = new int[V];
+
+            for (int i = 0; i < V; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        int find(int node) {
+            if (parent[node] != node) {
+                parent[node] = find(parent[node]); 
+            }
+            return parent[node];
+        }
+
+        boolean union(int u, int v) {
+            int pu = find(u);
+            int pv = find(v);
+
+            if (pu == pv) return false;
+
+            if (rank[pu] > rank[pv]) {
+                parent[pv] = pu;
+            } else if (rank[pv] > rank[pu]) {
+                parent[pu] = pv;
+            } else {
+                parent[pv] = pu;
+                rank[pu]++;
+            }
+            return true;
+        }
+    }
+
+    public int findCircleNum(int[][] isConnected) {
+        int n = isConnected.length;
+        UnionFind uf = new UnionFind(n);
+
+
+        for (int i = 0; i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (isConnected[i][j] == 1) {
+                    uf.union(i, j);
+                }
+            }
+        }
+        int count = 0;
+        for (int i = 0; i < n; i++) {
+            if (uf.find(i) == i) {
+                count++;
+            }
+        }
+        return count;
+    }
+}
