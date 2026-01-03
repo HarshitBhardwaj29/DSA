@@ -144,3 +144,69 @@ class Solution {
         return count;
     }
 }
+
+
+///// Number of Operations to Make Network Connected
+
+class Solution {
+
+    class Union {
+        int[] parent;
+        int[] rank;
+
+        Union(int V) {
+            parent = new int[V];
+            rank = new int[V];
+            for (int i = 0; i < V; i++) {
+                parent[i] = i;
+                rank[i] = 0;
+            }
+        }
+
+        int find(int v) {
+            if (parent[v] != v) {
+                parent[v] = find(parent[v]);
+            }
+            return parent[v];
+        }
+
+        boolean union(int u, int v) {
+            int pu = find(u);
+            int pv = find(v);
+
+            if (pu == pv) return false;
+
+            if (rank[pu] > rank[pv]) {
+                parent[pv] = pu;
+            } else if (rank[pv] > rank[pu]) {
+                parent[pu] = pv;
+            } else {
+                parent[pv] = pu;
+                rank[pu]++;
+            }
+            return true;
+        }
+    }
+
+    public int makeConnected(int n, int[][] connections) {
+        if (connections.length < n - 1) return -1;
+
+        Union uf = new Union(n);
+        int extra = 0;
+
+        for (int[] con : connections) {
+            if (!uf.union(con[0], con[1])) {
+                extra++;
+            }
+        }
+
+        int components = 0;
+        for (int i = 0; i < n; i++) {
+            if (uf.find(i) == i) {
+                components++;
+            }
+        }
+        return (extra >= components - 1) ? components - 1 : -1;
+    }
+}
+
