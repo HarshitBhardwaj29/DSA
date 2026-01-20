@@ -1,15 +1,23 @@
 class Solution {
     public int numTeams(int[] rating) {
-        int c=0;
+        int n = rating.length;
+        int teams = 0;
 
-        for(int i=0;i<rating.length-2;i++){
-            for(int j=i+1;j<rating.length-1;j++){
-                for(int k=j+1;k<rating.length;k++){
-                    if((rating[i]<rating[j])&&(rating[j]<rating[k]))c++;
-                    else if((rating[i]>rating[j])&&(rating[j]>rating[k]))c++;
-                }
+        for (int j = 0; j < n; j++) {
+            int leftSmaller = 0, leftGreater = 0;
+            int rightSmaller = 0, rightGreater = 0;
+            for (int i = 0; i < j; i++) {
+                if (rating[i] < rating[j]) leftSmaller++;
+                else if (rating[i] > rating[j]) leftGreater++;
             }
+            for (int k = j + 1; k < n; k++) {
+                if (rating[k] > rating[j]) rightGreater++;
+                else if (rating[k] < rating[j]) rightSmaller++;
+            }
+
+            teams += leftSmaller * rightGreater;  
+            teams += leftGreater * rightSmaller;
         }
-        return c;
+        return teams;
     }
 }
