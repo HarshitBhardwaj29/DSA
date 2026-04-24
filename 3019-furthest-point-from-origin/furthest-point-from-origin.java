@@ -11,7 +11,6 @@ class Solution {
             }
         }
         int min = Math.min(l,r);
-        System.out.println(min);
         return moves.length()-2*min;
     }
 }
